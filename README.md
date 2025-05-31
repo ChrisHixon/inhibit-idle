@@ -1,11 +1,16 @@
-# inhibit-idle
-Run a command with idle inhibited.
+inhibit-idle
+============
 
 ```
-Usage: inhibit-idle -h | --help | (-SHORTMETHOD | --LONGMETHOD) CMD [ARG]...
+Usage: inhibit-idle [OPTION]... METHOD CMD [ARG]...
 
-METHODS:
+Run a command with idle inhibited. Example: inhibit-idle -s sleep 60
+
+INHIBIT METHODS:
   -s, --screensaver     ScreenSaver (dbus)
   -l, --logind          logind/systemd (dbus)
   -w, --wayland         Wayland (protocol)
+
+OPTIONS:
+  -h, --help            display help
 ```

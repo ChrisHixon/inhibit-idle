@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
-
-# Usage: inhibit-idle -h | --help | (-SHORTMETHOD | --LONGMETHOD) CMD [ARG]...
-# Run a command with idle inhibited, using one of the following methods:
-# 1) ScreenSaver (dbus)     [ -s, --screensaver ]
-# 2) logind/systemd (dbus)  [ -l, --logind ]
-# 3) Wayland(via protocol)  [ -w, --wayland ]
+#;
+#: Usage: inhibit-idle [OPTION]... METHOD CMD [ARG]...
+#:
+#: Run a command with idle inhibited. Example: inhibit-idle -s sleep 60
+#:
+#: INHIBIT METHODS:
+#:   -s, --screensaver     ScreenSaver (dbus)
+#:   -l, --logind          logind/systemd (dbus)
+#:   -w, --wayland         Wayland (protocol)
+#:
+#: OPTIONS:
+#:   -h, --help            display help
+#;
 
 APP_NAME="inhibit-idle"
 INHIBIT_REASON="Running command with idle inhibited..."
@@ -15,15 +22,21 @@ import subprocess
 import sys
 
 def usage(out=sys.stdout):
-    print(f"Usage: {os.path.basename(sys.argv[0])} -h | --help | (-SHORTMETHOD | --LONGMETHOD) CMD [ARG]...", file=out)
+    help(usage_only=True, out=out)
 
-def help(out=sys.stdout):
-    usage(out=out)
-    print(f"\nRun a command with idle inhibited. Example: inhibit-idle -s sleep 60\n", file=out)
-    print(f"METHODS:", file=out)
-    print(f"  -s, --screensaver     ScreenSaver (dbus)", file=out)
-    print(f"  -l, --logind          logind/systemd (dbus)", file=out)
-    print(f"  -w, --wayland         Wayland (protocol)", file=out)
+def help(usage_only=False, out=sys.stdout):
+    start = "#: Usage:" if usage_only else "#:"
+    with open(os.path.abspath(__file__), 'r') as f:
+        for line in f:
+            if line.startswith(start):
+                print(line[3:].rstrip(), file=out)
+
+def readme(out=sys.stdout):
+    print(APP_NAME, file=out)
+    print("=" * len(APP_NAME), file=out)
+    print("\n```", file=out)
+    help(out=out)
+    print("```", file=out)
 
 def print_exception(e):
     message = str(e)
@@ -149,9 +162,13 @@ def method_wayland(*command):
         shutdown()
 
 def main():
-    if len(sys.argv) == 2 and sys.argv[1] in ["--help", "-h"]:
-        help()
-        sys.exit(0)
+    if len(sys.argv) == 2:
+        if sys.argv[1] in ["--help", "-h"]:
+            help()
+            sys.exit(0)
+        elif sys.argv[1] in ["--readme"]:
+            readme()
+            sys.exit(0)
 
     if len(sys.argv) < 3:
         usage(sys.stderr)
